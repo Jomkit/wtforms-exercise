@@ -6,7 +6,7 @@
 <div class="container justify-content-center">
     <h1 class="display-2 text-center">Add Pet Form</h1>
 
-    <form method="POST" id="add-pet-form">
+    <form method="POST" id="add-pet-form" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
         {% for field in form if field.widget.input_type != 'hidden' %}
         {% if not loop.last %}

@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import validates
 
 db = SQLAlchemy()
 
@@ -23,6 +24,9 @@ class Pet(db.Model):
     species = db.Column(db.Text, 
                         nullable=False)
 
+    # photo_upload is reference to filename
+    photo_upload = db.Column(db.Text)
+
     photo_url = db.Column(db.Text, default=default_url)
 
     age = db.Column(db.Integer)
@@ -36,3 +40,10 @@ class Pet(db.Model):
     def __repr__(self):
         p = self
         return f"<Pet {p.id}, name={p.name}, species={p.species}, available={p.available}>"
+    
+    @validates('photo_url')
+    def empty_string_to_null(self, key, value):
+        if value == '':
+            return None
+        else:
+            return value

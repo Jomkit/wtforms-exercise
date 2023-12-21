@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, Pet
 from forms import PetForm
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///adopt'
@@ -29,27 +31,28 @@ def home():
 def add_pet_form():
     """Display add pet form and also post data for adding pets"""
     form = PetForm()
-
+    path = 'static/images/'
+    
     if form.validate_on_submit():
-        
-        name = form.name.data
-        species = form.species.data
-        photo_url = form.photo_url.data
-        if photo_url == '':
-            photo_url = None
+        pet_data = { k:v for (k, v) in form.data.items() if (k != 'csrf_token') if (k != 'photo_upload')}
+        new_pet = Pet(**pet_data)
 
-        age = form.age.data
-        notes = form.notes.data
+        # handling file upload
+        f = form.photo_upload.data
+        filename = secure_filename(f.filename)
+        f.save(os.path.join(path, filename))  
         
-        new_pet = Pet(name=name, species=species, photo_url=photo_url, age=age, notes=notes)
-
+        new_pet.photo_upload = filename
+      
         db.session.add(new_pet)
         db.session.commit()
-
+        
         flash('New Pet Added!', 'success')
         return redirect('/')
     
     else:
+        # add pet form page is either being visited for the first time
+        # or there was an error with the form submission
         return render_template('/add-pet-form.html', form=form)
     
 @app.route('/<int:pet_id>', methods=["GET","POST"])
@@ -70,4 +73,6 @@ def show_edit_pet_page(pet_id):
         return redirect('/')
     
     else:
+        # edit pet form page is either being visited for the first time
+        # or there was an error with the form submission
         return render_template('pet-page.html', pet=pet, form=form)
