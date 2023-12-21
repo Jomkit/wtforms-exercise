@@ -4,7 +4,12 @@
 
 {% block content %}
 <div class="container-fluid px-5">
-    <h1 class="display-1 text-center mb-5">Pet Adoption Agency</h1>
+    <h1 class="display-1 text-center mb-3">Pet Adoption Agency</h1>
+    <div class="row text-center">
+        <a href="/add" class="btn btn-info btn-lg">Add Pet</a>  
+    </div>
+
+
     <div class="row bg-light rounded mb-3">
     <h2 class="my-3">Available Pets</h2>
         {% for pet in pets if pet.available %}
@@ -44,7 +49,7 @@
 
         {% endfor %}
     </div>
-    <a href="/add" class="btn btn-info mt-2">Add Pet</a>    
+  
 </div>
 
 {% endblock %}

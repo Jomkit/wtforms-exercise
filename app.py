@@ -27,26 +27,34 @@ def home():
     pets = Pet.query.all()
     return render_template('home.html', pets=pets)
 
+def handle_file_uploads(file_data, path):
+    # handling file upload
+    if file_data:
+        filename = secure_filename(file_data.filename)
+        file_data.save(os.path.join(path, filename))  
+    
+        return filename
+
 @app.route('/add', methods=['GET', 'POST'])
 def add_pet_form():
     """Display add pet form and also post data for adding pets"""
     form = PetForm()
-    path = 'static/images/'
+    path = 'static/'
     
     if form.validate_on_submit():
         pet_data = { k:v for (k, v) in form.data.items() if (k != 'csrf_token') if (k != 'photo_upload')}
         new_pet = Pet(**pet_data)
+        # new pets should  be available when first added
+        new_pet.available = True
 
         # handling file upload
-        f = form.photo_upload.data
-        filename = secure_filename(f.filename)
-        f.save(os.path.join(path, filename))  
-        
-        new_pet.photo_upload = filename
+        if form.photo_upload.data:
+            filename = handle_file_uploads(form.photo_upload.data, path)        
+            new_pet.photo_upload = filename
       
         db.session.add(new_pet)
         db.session.commit()
-        
+
         flash('New Pet Added!', 'success')
         return redirect('/')
     
@@ -59,9 +67,16 @@ def add_pet_form():
 def show_edit_pet_page(pet_id):
     """Show pet page and handle edits"""
     pet = Pet.query.get_or_404(pet_id)
-    form = PetForm(obj=pet)
     
+    form = PetForm(obj=pet)
+    path = 'static/'
+
     if form.validate_on_submit():
+
+        # handling file upload
+        if not isinstance(form.photo_upload.data, str):
+            filename = handle_file_uploads(form.photo_upload.data, path)        
+            pet.photo_upload = filename
 
         pet.photo_url = form.photo_url.data
         pet.notes = form.notes.data

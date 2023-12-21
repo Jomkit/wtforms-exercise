@@ -1,6 +1,6 @@
 {# html template for the pet photo image used in home page and for pet page #}
 {% if pet.photo_upload %}
-<img src="../static/images/{{pet.photo_upload}}" class="img-thumbnail" style="max-width:60%; height:auto;">
+<img src="../static/{{pet.photo_upload}}" class="img-thumbnail" style="max-width:60%; height:auto;">
 {% else %}
 <img src="{{pet.photo_url}}" class="img-thumbnail" style="max-width:60%; height:auto;">
 {% endif %}

@@ -21,10 +21,14 @@
                 {% endif %}
             </p>
 
-            <form method="POST" id="edit-pet-form">
+            <form method="POST" id="edit-pet-form" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
             <div class="col">
             
+                <div class="col mb-3">
+                    {{form.photo_upload.label}}
+                    {{form.photo_upload(class_='form-control')}}
+                </div>
                 <div class="col mb-3">
                     {{form.photo_url.label}}
                     {{form.photo_url(class_='form-control')}}
